@@ -1,0 +1,73 @@
+{% extends 'store/main.html' %}
+
+{% load static %}
+{% load bootstrap_tags %}
+{% load store_extras %}
+
+{% block content %}    
+<div class="input-group-btn">
+    <div class="btn-group" role="group">
+        <div class="dropdown dropdown-lg">
+
+    <button type="button" class="btn btn-outline-info dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+        <i class="fas fa-filter"></i>
+    </button>
+    <div class="dropdown-menu dropdown-menu-right" role="menu" style="width: 400px; padding-left: 20%; padding-right: 20%;">
+        <form class="form-horizontal" role="form" method="GET">
+            {{ productFilter.form|as_bootstrap }}
+            <button type="submit" class="btn btn-primary btn-block">Search :: <i class="fas fa-search"></i></button>
+        </form>
+    </div>
+                
+        </div>
+    </div>
+</div>
+<br>
+
+<div class="row">
+    {% for product in products_page %}
+	<div class="col-lg-3" style="padding-bottom: 10px;">
+        <img class="thumbnail" src="{{product.get_image.imageURL}}">
+        <div class="box-element product">
+            <h6 style="text-align: center;"><strong>{{product.title}}</strong></h6>
+            <hr>
+            {% if request.user != product.creator %}
+            <button data-product="{{product.id}}" data-action="add" class="btn btn-outline-secondary add-btn update-cart">Add to Cart</button>
+            {% endif %}
+            <a class="btn btn-outline-success" href="{% url 'product_details' product.id %}">View</a><br>
+            <h4 style="display: inline-block"><strong>USD ${{product.price|floatformat:2}}</strong></h4>
+    
+        </div>
+    </div>
+    {% empty %}
+        <div style="padding-left: 24%; padding-top: 11%; padding-bottom: 10%;">
+            <div class="card card-body" style="width: 600px; text-align: center;">
+                    <div class="alert alert-warning" role="alert" >
+                        there is no product ...
+                    </div> 
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<div style="position: relative; left: 830px; width: 396px; padding-top: 10px;">
+<div class="pagination">
+    <span class="step-links">
+        {% if products_page.has_previous %}
+            <a href="{% my_url 1 'page' request.GET.urlencode %}" class="btn btn-info m2">&laquo; first</a>
+            <a href="{% my_url products_page.previous_page_number 'page' request.GET.urlencode %}" class="btn btn-primary m2">previous</a>
+        {% endif %}
+
+        <span class="current btn btn-light m2">
+            Page {{ products_page.number }} of {{ products_page.paginator.num_pages }}
+        </span>
+
+        {% if products_page.has_next %}
+            <a href="{% my_url products_page.next_page_number 'page' request.GET.urlencode %}" class="btn btn-primary m2">next</a>
+            <a href="{% my_url products_page.paginator.num_pages 'page' request.GET.urlencode %}" class="btn btn-info m2">last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+</div>
+{% endblock content %}
+

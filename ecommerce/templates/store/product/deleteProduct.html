@@ -1,0 +1,25 @@
+{% extends 'store/main.html' %}
+{% load static %}
+{% block content %}
+<div style="padding-top: 11%; padding-bottom: 10%;">
+
+<div class="row mt-2">
+    <div class="col-md-6 m-auto">
+        <div class="card card-body">
+            <form method="POST">
+                {% csrf_token %}
+                <div class="alert alert-danger" role="alert">
+                    Are you sure you are removing this product : {{ product.title }} ?
+                </div> 
+                <div style="text-align: center;">
+                    <button type="submit" class="btn btn-danger">Yes</button>
+                    <a href="{% url 'myStore' %}" class="btn btn-info">No</a>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+</div>
+{% endblock content %}
