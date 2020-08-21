@@ -98,3 +98,11 @@ class Contact(models.Model):
 
 	def __str__(self):
 		return self.email
+
+class Review(models.Model):
+	customer = models.ForeignKey(Account, on_delete=models.CASCADE, null=True)
+	product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)
+	rating = models.IntegerField()
+
+	def __str__(self):
+		return self.customer.email + ' ==> ' + self.product.title + ' : ' + str(self.rating)
