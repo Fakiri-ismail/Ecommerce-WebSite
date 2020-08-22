@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Product,Order,OrderItem,ShippingAddress, ProductImage, Category, Contact
+from .models import *
 
 class ProductImageAdmin(admin.StackedInline):
     model=ProductImage
@@ -45,3 +45,4 @@ admin.site.register(Order, OrderAdmin)
 admin.site.register(OrderItem, OrderItemAdmin)
 admin.site.register(ShippingAddress,ShippingAddressAdmin)
 admin.site.register(Contact,ContactAdmin)
+admin.site.register(Review)

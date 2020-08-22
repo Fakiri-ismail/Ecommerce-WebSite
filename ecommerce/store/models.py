@@ -28,6 +28,19 @@ class Product(models.Model):
 	@property
 	def get_image(self):
 		return self.productimage_set.all()[0]
+	
+	@property
+	def get_UsersReview(self):
+		reviews = Review.objects.filter(product=self)
+		user_id = reviews.values_list('customer', flat=True).distinct()
+		users = Account.objects.filter(id__in=user_id)
+		return users
+	
+	def alreadyRated(self,user):
+		if user in self.get_UsersReview:
+			return True
+		else:
+			return False
 
 class ProductImage(models.Model):
 	product = models.ForeignKey(Product, on_delete=models.CASCADE, null=False)
@@ -102,7 +115,9 @@ class Contact(models.Model):
 class Review(models.Model):
 	customer = models.ForeignKey(Account, on_delete=models.CASCADE, null=True)
 	product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)
-	rating = models.IntegerField()
+	rating = models.IntegerField(default=1)
+	comment = models.CharField(max_length=1000, null=True)
+	date_review = models.DateTimeField(auto_now_add=True)
 
 	def __str__(self):
 		return self.customer.email + ' ==> ' + self.product.title + ' : ' + str(self.rating)

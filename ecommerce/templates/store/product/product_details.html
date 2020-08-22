@@ -1,59 +1,130 @@
 {% extends 'store/main.html' %}
 {% load static %}
 {% block content %}
-<div style="margin-top: 50px;">
-<div class="row">
-	<div class="col-md-7">
-        <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
-            <div class="carousel-inner">
-                {% for image in product.get_images %}
-                <div class="carousel-item {% if forloop.counter0 == 0 %} active {% endif %}">
-                    <img src="{{image.imageURL}}" class="d-block w-100" width="1000px" height="450px">
+<div style="margin-top: 20px;">
+    <div class="row">
+        <div class="col-md-7">
+            <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
+                <div class="carousel-inner">
+                    {% for image in product.get_images %}
+                    <div class="carousel-item {% if forloop.counter0 == 0 %} active {% endif %}">
+                        <img src="{{image.imageURL}}" class="d-block w-100" width="1000px" height="450px">
+                    </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
+                <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Previous</span>
+                </a>
+                <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Next</span>
+                </a>
             </div>
-            <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="sr-only">Previous</span>
-            </a>
-            <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="sr-only">Next</span>
-            </a>
+        </div>
+        <div class="col-md-5">
+            <p style="background: green; width: 50px; color: white; font-size: 12px; font-weight: bold; text-align: center;">
+                NEW</p>
+
+            <h2 style="color: #555;">{{product.title}}</h2>
+
+            <img src="{%  static 'images/stars.png' %}" width="100" height="17" >
+            <p class="text-muted">{{product.description}}</p>
+
+            <p style="color: #FE890F; font-size: 26px; font-weight: bold;">
+                USD ${{product.price|floatformat:2}}</p>
+
+            <p><b>Store : </b>{{product.creator.storeName}}</p>
+            <p><b>Avialability : </b>In Stock</p>
+
+            <i class="fas fa-boxes"></i> <label><b>Quantity : </b></label>
+            <input type="text" value="{{product.quantity}}" style="border: 1px solid #ccc; font-weight: bold; height: 33px; text-align: center; width:70px ;" disabled="disabled">
+            <br><br>
+            {% if request.user != product.creator %}
+            <button type="button" class="btn btn-success add-btn update-cart" data-product="{{product.id}}" data-action="add">
+                Add to cart</button>
+            {% endif %}
+            {% if request.user == product.creator %}
+            <a href="{% url 'updatePrudact' product.id %}" class="btn btn-info">Update</a>
+            <a href="{% url 'deleteProduct' product.id %}" class="btn btn-danger">Delete</a>
+                {% if product.is_hide %}
+                    <a href="{% url 'archivePrudact' product.id %}" class="btn btn-secondary">un-archive</a>
+                {% else %}    
+                    <a href="{% url 'archivePrudact' product.id %}" class="btn btn-secondary">archive</a>
+                {% endif %}
+            {% endif %}
         </div>
     </div>
+</div><br>
+
+<h5 style="color: black;">REVIEWS</h3>
+<hr>
+<div class="row">
+
+    <div class="col-md-7">
+
+         {% for review in reviews_page %}
+            <ul class="media-list">
+                <li class="media">
+                    <img src="{%  static 'images/user.png' %}">
+                    <div style="padding-left: 10px;">
+                        <strong class="text-success">{{review.customer.email}}</strong>
+                        <span style="text-align: right;">
+                            <i class="far fa-clock"></i>
+                            <small class="text-muted">{{review.date_review}}</small>
+                        </span>
+                        <p>{{review.comment}}.</p>
+                    </div>
+                </li>
+            </ul>
+        {% empty %}
+            <div class="alert alert-secondary" role="alert" style="text-align: center;">
+                <samp>No Comment</samp>
+            </div> 
+        {% endfor %}
+        <div class="pagination" style="justify-content: center;">
+            <span class="step-links">
+                {% if reviews_page.has_previous %}
+                    <a href="?page=1" class="btn btn-dark m2"><i class="fas fa-fast-backward"></i></a>
+                    <a href="?page={{ reviews_page.previous_page_number }}" class="btn btn-secondary m2"><i class="fas fa-chevron-circle-left"></i></a>
+                {% endif %}
+        
+                <span class="current  btn btn-light m2">
+                    Page {{ reviews_page.number }} of {{ reviews_page.paginator.num_pages }}
+                </span>
+        
+                {% if reviews_page.has_next %}
+                    <a href="?page={{ reviews_page.next_page_number }}" class="btn btn-secondary m2"><i class="fas fa-chevron-circle-right"></i></a>
+                    <a href="?page={{ reviews_page.paginator.num_pages }}" class="btn btn-dark m2"><i class="fas fa-fast-forward"></i></a>
+                {% endif %}
+            </span>
+        </div>
+    </div>
+    {% if request.user.is_authenticated %}
     <div class="col-md-5">
-        <p style="background: green; width: 50px; color: white; font-size: 12px; font-weight: bold; text-align: center;">
-            NEW</p>
-
-        <h2 style="color: #555;">{{product.title}}</h2>
-
-        <img src="{%  static 'images/stars.png' %}" width="100" height="17" >
-        <p class="text-muted">{{product.description}}</p>
-
-        <p style="color: #FE890F; font-size: 26px; font-weight: bold;">
-            USD ${{product.price|floatformat:2}}</p>
-
-        <p><b>Store : </b>{{product.creator.storeName}}</p>
-        <p><b>Avialability : </b>In Stock</p>
-
-        <i class="fas fa-boxes"></i> <label><b>Quantity : </b></label>
-        <input type="text" value="{{product.quantity}}" style="border: 1px solid #ccc; font-weight: bold; height: 33px; text-align: center; width:70px ;" disabled="disabled">
-        <br><br>
-        {% if request.user != product.creator %}
-        <button type="button" class="btn btn-success add-btn update-cart" data-product="{{product.id}}" data-action="add">
-            Add to cart</button>
-        {% endif %}
-        {% if request.user == product.creator %}
-        <a href="{% url 'updatePrudact' product.id %}" class="btn btn-info">Update</a>
-        <a href="{% url 'deleteProduct' product.id %}" class="btn btn-danger">Delete</a>
-            {% if product.is_hide %}
-                <a href="{% url 'archivePrudact' product.id %}" class="btn btn-secondary">un-archive</a>
-            {% else %}    
-                <a href="{% url 'archivePrudact' product.id %}" class="btn btn-secondary">archive</a>
-            {% endif %}
+        <h5>Write your Review</h5>
+        {% if related %}
+            <div class="alert alert-success" role="alert" style="text-align: center;">
+                <samp>You have already rated this product !</samp>
+            </div>
+        {% else %}
+            <form method="POST">
+                {% csrf_token %}
+                <textarea class="form-control" name="comment" placeholder="Your review..." rows="3"></textarea>
+                <samp><strong>Your Rating : </strong></samp>
+                <div style="display: inline-block; padding-right: 35px;">
+                    <div class="rating"> 
+                        <input type="radio" name="rating" value="5" id="5"><label for="5">☆</label> 
+                        <input type="radio" name="rating" value="4" id="4"><label for="4">☆</label> 
+                        <input type="radio" name="rating" value="3" id="3"><label for="3">☆</label> 
+                        <input type="radio" name="rating" value="2" id="2"><label for="2">☆</label> 
+                        <input type="radio" name="rating" value="1" id="1"><label for="1">☆</label>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-danger">Submit</button>
+            </form>
         {% endif %}
     </div>
-</div>
-</div>
+    {% endif %}
+</div> 
 {% endblock content %}

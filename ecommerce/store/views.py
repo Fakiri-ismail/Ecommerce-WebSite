@@ -4,7 +4,7 @@ from django.http import JsonResponse, Http404
 from django.forms import modelformset_factory
 from django.core.paginator import Paginator
 
-from .models import Product,Order,OrderItem,ShippingAddress, Category, ProductImage, Contact
+from .models import *
 from .utils import cartData, guestOrder, cartItems
 from .forms import ProductForm
 from .filters import ProductFilter
@@ -81,8 +81,22 @@ def product_details(request, id):
 	cartItems = data['cartItems']
 
 	product = get_object_or_404(Product, id=id)
+	customer = request.user
 
-	context = {'product':product, 'cartItems':cartItems}
+	if request.method=='POST':
+		comment = request.POST['comment']
+		rating = request.POST['rating']
+		review = Review(product=product, customer=customer, rating=rating, comment=comment)
+		review.save()
+
+	reviews = Review.objects.filter(product=product)
+	paginator = Paginator(reviews, 3)
+	page_num = request.GET.get('page')
+	reviews_page = paginator.get_page(page_num)
+
+	related = product.alreadyRated(user=request.user)
+
+	context = {'product':product, 'reviews_page':reviews_page, 'cartItems':cartItems, 'related':related}
 	return render(request, 'store/product/product_details.html', context)
 
 @login_required(login_url="/login/")
