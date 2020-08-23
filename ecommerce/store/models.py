@@ -1,5 +1,6 @@
 from django.db import models
 from utilisateurs.models import Account
+import statistics
 
 class Category(models.Model):
 	name = models.CharField(max_length=200)
@@ -28,6 +29,12 @@ class Product(models.Model):
 	@property
 	def get_image(self):
 		return self.productimage_set.all()[0]
+	
+	@property
+	def get_rating(self):
+		reviews = Review.objects.filter(product=self)
+		ratings = reviews.values_list('rating', flat=True)
+		return statistics.mean(ratings)
 	
 	@property
 	def get_UsersReview(self):

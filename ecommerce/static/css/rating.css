@@ -45,3 +45,7 @@
     border-bottom:1px dashed #efefef;
     margin-bottom:25px;
 }
+
+.media-list .media .icon-b {
+    color: orange;
+}
