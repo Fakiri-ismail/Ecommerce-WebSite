@@ -198,8 +198,8 @@ def deleteProduct(request,id):
 
 		if request.method=='POST':
 			product.delete()
-			products=Product.objects.filter(creator=request.user)
-			context = {'products':products,'cartItems':cartItems}
+			products_page=Product.objects.filter(creator=request.user)
+			context = {'products_page':products_page,'cartItems':cartItems}
 
 			return render(request, 'store/myStore.html', context)
 

@@ -1,10 +1,18 @@
+from bs4 import BeautifulSoup
+from selenium import webdriver
 import requests
 import urllib.request
-from bs4 import BeautifulSoup
+import random
 from django.core.files import File
 
+from store.models import *
+from utilisateurs.models import Account
+
 baseUrl='https://us.shein.com/style'
-url = 'https://us.shein.com/style/Vacation-Dresses-sc-00100461.html?icn=style&ici=ma_tab01navbar05menu01dir01&srctype=category&userpath=category%3EFEMME%3EROBES%3ESHOPPEZ%20PAR%20STYLE%3EBoh%C3%A8me&scici=navbar_WomenHomePage~~tab01navbar05menu01dir01~~5_1_1~~itemPicking_00100461~~SPcCccWomenCategory~~0~~50001&is_manual_change_site=0&ref=ma&ret=us&from_country=ma'
+
+# ---- PRODUCT LIST URL ---
+url = 'https://us.shein.com/category/Kids-FW2020-sc-00827906.html?ici=us_tab04navbar02&srctype=category&userpath=category%3EKIDS%3EFW%202020&scici=navbar_KidsHomePage~~tab04navbar02~~2~~webLink~~SPcCccKidsCategory~~0~~50000'
+
 headers = {
     'Accept-Encoding': 'gzip, deflate, sdch',
     'Accept-Language': 'en-US,en;q=0.8',
@@ -14,6 +22,7 @@ headers = {
     'Connection': 'keep-alive',
 }
 
+# -------------- extract all product links from a product list ------------------
 r = requests.get(url=url, headers=headers)
 soup = BeautifulSoup(r.content, 'lxml')
 productList = soup.find_all('div', class_='c-goodsitem__ratiowrap')
@@ -23,8 +32,52 @@ for item in productList:
     for link in item.find_all('a', href=True):
         productLinks.append(baseUrl + link['href'])
 
-testlink='https://us.shein.com/style/Floral-Print-Cami-Dress-p-1201607-cat-1727.html?scici=navbar_WomenHomePage~~tab01navbar05menu01dir01~~5_1_1~~itemPicking_00100461~~SPcCccWomenCategory~~0~~50001'
-r = requests.get(testlink, headers=headers)
-soup = BeautifulSoup(r.content, 'lxml')
-print(type(soup))
-print(soup.find_all('div', class_='swiper-slide product-intro__main-item cursor-zoom-in'))
+# ------ SCRAP AND ISERT PRODUCT IN DATABASE ------
+cat = Category.objects.get(id=3)
+user = Account.objects.get(email='aziza@gmail.com')
+
+driver = webdriver.Chrome()
+j=1
+for productLink in productLinks:
+    driver.get(productLink)
+    soup = BeautifulSoup(driver.page_source,"lxml")
+
+    if soup.find('div', class_='product-intro__head-name') is None:
+        continue
+    else:
+        title=soup.find('div', class_='product-intro__head-name').text.strip()
+
+        descrip=''
+        for i in soup.find_all('div', class_='product-intro__description-table-item'):
+            key = i.find('div', class_='key').text.strip()
+            val = i.find('div', class_='val').text.strip()
+            keyVal = key+' '+val
+            descrip = descrip+" | "+keyVal
+
+        price = random.randrange(10,20)
+        quantity = random.randrange(100,200)
+
+        if soup.find('img', class_='j-verlok-lazy loaded') is None:
+            continue
+        else:
+            imglink = 'http:' + soup.find('img', class_='j-verlok-lazy loaded').get('src')
+            imglink = imglink.replace('220x293','635x550')  # IMAGE SIZE
+            urllib.request.urlretrieve(imglink,'zzb_'+str(j)+'.jpg')
+
+            product = Product(title=title, description=descrip, price=price, quantity=quantity, creator=user, category=cat)
+            product.save()
+
+        # imgLink=soup.find('img', class_='j-verlok-lazy loaded')
+        # print(imgLink.get('src'))
+        # urllib.request.urlretrieve('http:'+imgLink.get('src'),title+'.jpg')
+
+        # users = Account.objects.all()
+        # pr = Product.objects.get(title=title)
+        # for us in users:
+        #     r = random.randrange(1,5)
+        #     Review(product=pr, customer=us, rating=r)
+
+    print('product ('+str(j)+') : added')
+    j=j+1
+    print('-------------------------------')
+driver.quit()

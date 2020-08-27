@@ -9,8 +9,8 @@ class Category(models.Model):
 		return self.name
 
 class Product(models.Model):
-	title = models.CharField(max_length=200)
-	description = models.CharField(max_length=3000)
+	title = models.CharField(max_length=2000)
+	description = models.CharField(max_length=30000)
 	price = models.FloatField()
 	quantity = models.IntegerField(default=0, null=True)
 	is_hide = models.BooleanField(default=False)
