@@ -1,11 +1,12 @@
 from django.contrib import admin
 from .models import *
+from import_export.admin import ImportExportModelAdmin
 
 class ProductImageAdmin(admin.StackedInline):
     model=ProductImage
 
 @admin.register(Product)
-class ProductAdmin(admin.ModelAdmin):
+class ProductAdmin(ImportExportModelAdmin):
     inlines = [ProductImageAdmin]
 
     list_display = ('title','price','quantity', 'is_hide', 'category','creator','created')
@@ -14,9 +15,13 @@ class ProductAdmin(admin.ModelAdmin):
 
     class Meta:
         model=Product
-    
+
 @admin.register(ProductImage)
 class ProductImageAdmin(admin.ModelAdmin):
+    pass
+
+@admin.register(Review)
+class ReviewAdmin(ImportExportModelAdmin):
     pass
 
 class OrderAdmin(admin.ModelAdmin):
@@ -45,4 +50,5 @@ admin.site.register(Order, OrderAdmin)
 admin.site.register(OrderItem, OrderItemAdmin)
 admin.site.register(ShippingAddress,ShippingAddressAdmin)
 admin.site.register(Contact,ContactAdmin)
-admin.site.register(Review)
+admin.site.unregister(Review)
+admin.site.register(Review, ReviewAdmin)
