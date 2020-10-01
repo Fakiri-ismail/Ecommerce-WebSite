@@ -10,9 +10,9 @@ comment = {
 }
 
 productList = list(Product.objects.all())
-products = productList[:330]
+products = productList[430:470]
 
-emailList =('fakiri@gmail.com','ismail@gmail.com','ilyass@gmail.com')
+emailList =('fakiri@gmail.com',)
 for email in emailList:
     customer = Account.objects.get(email=email)
     for product in products:
