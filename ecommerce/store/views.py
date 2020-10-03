@@ -81,6 +81,7 @@ def product_details(request, id):
 	cartItems = data['cartItems']
 
 	product = get_object_or_404(Product, id=id)
+	similarProducts = Product.objects.filter(is_hide=False)[:16]	######
 	customer = request.user
 
 	if request.method=='POST':
@@ -96,7 +97,7 @@ def product_details(request, id):
 
 	related = product.alreadyRated(user=request.user)
 
-	context = {'product':product, 'reviews_page':reviews_page, 'cartItems':cartItems, 'related':related}
+	context = {'product':product, 'reviews_page':reviews_page, 'cartItems':cartItems, 'related':related, 'similarProducts':similarProducts}
 	return render(request, 'store/product/product_details.html', context)
 
 @login_required(login_url="/login/")

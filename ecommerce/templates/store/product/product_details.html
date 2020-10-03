@@ -68,6 +68,24 @@
     </div>
 </div><br>
 
+<!-- Slider -->
+<h5 style="color: black;">SIMILAR PRODUCTS</h3>
+<hr>
+<div class="thumbnail-slider">
+	<div class="thumbnail-container">
+        {% for similarProduct in similarProducts %}
+		<div class="item">
+            <a href="{% url 'product_details' similarProduct.id %}">
+                <img src="{{similarProduct.get_image.imageURL}}">
+            </a>
+            <p>USD ${{similarProduct.price|floatformat:2}}</p>
+        </div>
+        {% endfor %}
+	</div>
+
+  <div class="controls"></div>
+</div>
+
 <!-- Product review -->
 <h5 style="color: black;">REVIEWS</h3>
 <hr>
