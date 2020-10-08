@@ -1,6 +1,8 @@
 import json
+from django.shortcuts import get_object_or_404
 from .models import Product,Order,OrderItem,ShippingAddress, ProductImage
 from utilisateurs.models import Account
+from recommendation_API.utils import makeRecommendation
 
 def cookieCart(request):
 	#Create empty cart for now for non-logged in user
@@ -83,3 +85,12 @@ def cartItems(request):
 	data = cartData(request)
 	cartItems = data['cartItems']
 	return {'cartItems':cartItems}
+
+def similarProduct(request, nbPrdt):
+	S=[]
+	userId = request.user.id
+	for prdtId in makeRecommendation(n_rec=nbPrdt, userId=userId):
+		product = get_object_or_404(Product, id=prdtId[0])
+		S.append(product)
+
+	return S

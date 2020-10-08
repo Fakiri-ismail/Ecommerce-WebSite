@@ -5,9 +5,11 @@ from django.forms import modelformset_factory
 from django.core.paginator import Paginator
 
 from .models import *
-from .utils import cartData, guestOrder, cartItems
+from .utils import cartData, guestOrder, cartItems, similarProduct
 from .forms import ProductForm
 from .filters import ProductFilter
+
+from recommendation_API.utils import makeRecommendation
 
 import json
 import datetime
@@ -15,7 +17,6 @@ import datetime
 def home(request):
 	data = cartData(request)
 	cartItems = data['cartItems']
-
 	products= []
 	products.append(Product.objects.get(id=96))
 	products.append(Product.objects.get(id=60))
@@ -81,9 +82,12 @@ def product_details(request, id):
 	cartItems = data['cartItems']
 
 	product = get_object_or_404(Product, id=id)
-	similarProducts = Product.objects.filter(is_hide=False)[:16]	######
 	customer = request.user
-
+	if request.user.is_authenticated:
+		similarProducts = similarProduct(request=request, nbPrdt=10)
+	else:
+		similarProducts = Product.objects.filter(is_hide=False)[:10]
+	
 	if request.method=='POST':
 		comment = request.POST['comment']
 		rating = request.POST['rating']
