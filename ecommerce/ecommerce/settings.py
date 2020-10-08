@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'store',
     'utilisateurs',
-    'recommendation_API',
+    'recommandation_API',
     'django_filters',
     'django_forms_bootstrap',
     'django_extensions',
