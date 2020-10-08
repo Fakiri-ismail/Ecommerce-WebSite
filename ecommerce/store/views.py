@@ -9,8 +9,6 @@ from .utils import cartData, guestOrder, cartItems, similarProduct
 from .forms import ProductForm
 from .filters import ProductFilter
 
-from recommendation_API.utils import makeRecommendation
-
 import json
 import datetime
 
