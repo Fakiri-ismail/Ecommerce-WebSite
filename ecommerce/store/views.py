@@ -13,6 +13,13 @@ import json
 import datetime
 
 def home(request):
+	# retrieve recommended products when a user logs in
+	global similarProducts					# we will use it in the 'Product details' page
+	if request.user.is_authenticated:
+		similarProducts = similarProduct(request=request, nbPrdt=10)
+	else:
+		similarProducts = Product.objects.filter(is_hide=False)[:10]
+
 	data = cartData(request)
 	cartItems = data['cartItems']
 	products= []
@@ -81,10 +88,10 @@ def product_details(request, id):
 
 	product = get_object_or_404(Product, id=id)
 	customer = request.user
-	if request.user.is_authenticated:
-		similarProducts = similarProduct(request=request, nbPrdt=10)
-	else:
-		similarProducts = Product.objects.filter(is_hide=False)[:10]
+	# if request.user.is_authenticated:
+	# 	similarProducts = similarProduct(request=request, nbPrdt=10)
+	# else:
+	# 	similarProducts = Product.objects.filter(is_hide=False)[:10]
 	
 	if request.method=='POST':
 		comment = request.POST['comment']
@@ -255,7 +262,6 @@ def updateItem(request):
 	customer = request.user
 	product = Product.objects.get(id=productId)
 	order, created = Order.objects.get_or_create(customer=customer, complete=False)
-
 	orderItem, created = OrderItem.objects.get_or_create(order=order, product=product)
 
 	if action == 'add':
