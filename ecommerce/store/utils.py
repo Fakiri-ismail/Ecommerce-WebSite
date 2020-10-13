@@ -1,8 +1,8 @@
 import json
 from django.shortcuts import get_object_or_404
 from .models import Product,Order,OrderItem,ShippingAddress, ProductImage
+from .recommandation import makeRecommandation
 from utilisateurs.models import Account
-from recommandation_API.utils import makeRecommandation
 
 def cookieCart(request):
 	#Create empty cart for now for non-logged in user
